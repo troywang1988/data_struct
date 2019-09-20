@@ -1,0 +1,191 @@
+#include <stdio.h>
+#include <stddef.h>
+
+#include "mymem.h"
+
+struct mymem_node_st
+{
+	struct mymem_node_st *prev,*next;
+	char *end;
+};
+
+#define MIN_NODE_SIZE ((sizeof(struct mymem_node_st) + (MAX_ALIGN-1)) & ~(MAX_ALIGN-1))
+
+#define RECEIVE_SIZE  32
+
+static void *align_down(void *p)
+{
+	return (void *)((size_t)p & ~(MAX_ALIGN - 1));	
+}
+static void *align_up(void *p)
+{
+	return (void *)(((size_t)p + MAX_ALIGN-1) & ~(MAX_ALIGN - 1));	
+}
+
+static int align_size(int size)
+{
+	return ((size + MAX_ALIGN-1) & ~(MAX_ALIGN - 1));	
+}
+
+void *mymem_init(void *ptr,int size)
+{
+	char *start,*end;
+	struct mymem_node_st *head,*node;
+
+	start = ptr;	
+	end = start + size;
+	printf("%p , %p\n",start,end);
+
+	start = align_up(start);
+	end = align_down(end);
+	printf("%p , %p\n",start,end);
+
+	head = (struct mymem_node_st *)start;
+	node = align_up(head+1);	
+
+	head->prev = head->next = node;
+	head->end = (char *)node;
+	
+	node->prev = node->next = head;
+	node->end = end;
+
+	return head;
+}
+
+static int alloc_size(int size)
+{
+	size = align_size(size) + align_size(sizeof(void *));
+	
+	return (size > MIN_NODE_SIZE ? size : MIN_NODE_SIZE);
+}
+
+static int node_size(struct mymem_node_st *node)
+{
+	return (node->end - (char *)node);
+}
+
+static struct mymem_node_st *find_(struct mymem_node_st  *handle,int size)
+{
+	struct mymem_node_st *cur,*min = handle;
+
+	for(cur = handle->next ;cur != handle ; cur = cur->next)
+		if(node_size(cur) >= size)
+			if(min == handle || node_size(cur) < node_size(min))
+				min = cur;
+			
+	return min;
+}
+
+static void *mem2usr(void *start,void *end)
+{
+	void **ptr = start;
+	
+	*ptr = end;
+
+	return align_up(ptr + 1);
+}
+
+
+void *mymem_myalloc(void *handle,int size)
+{
+	int sub;
+	void *start,*end;
+	struct mymem_node_st *node;
+
+	size = alloc_size(size);
+
+	node = find_(handle,size);
+	if(node == handle)
+		return NULL;
+
+	end = node->end;
+	sub = node_size(node) - size;
+
+	if(sub < RECEIVE_SIZE)//all
+	{
+		node->prev->next = node->next;
+		node->next->prev = node->prev;
+		start = node;
+	}
+	else
+	{
+		node->end -= size;
+		start = node->end;
+	}
+
+	return mem2usr(start,end);
+}
+
+static struct mymem_node_st *usr2mem(char *ptr)
+{
+	struct mymem_node_st *node;
+	void **end;
+
+	node = (struct mymem_node_st *)(ptr - align_size(sizeof(void *)));
+	
+	end = (void **)node;	
+
+	node->end = *end;
+	return node;
+}
+
+static void  insert_(struct mymem_node_st *handle,struct mymem_node_st  *node)
+{
+	struct mymem_node_st *cur;
+
+	for(cur = handle->next ;cur < node && cur != handle; cur = cur->next)
+		;
+
+	node->next = cur;
+	node->prev = cur->prev;
+	node->next->prev = node;
+	node->prev->next = node;
+}
+
+static void  merge(struct mymem_node_st *handle,struct mymem_node_st  *node)
+{
+	
+	if((char *)node->next == node->end)//BACK
+	{
+		node->end = node->next->end;
+		node->next = node->next->next;
+		node->next->prev = node;
+	}
+	if(node->prev != handle && (char *)node == node->prev->end)
+	{
+		node = node->prev;		
+		node->end = node->next->end;
+        node->next = node->next->next;
+        node->next->prev = node;
+	}
+}
+
+void mymem_myfree(void *handle,void *ptr)
+{
+	struct mymem_node_st *node;	
+
+	node = usr2mem(ptr);
+
+	insert_(handle,node);
+
+	merge(handle,node);
+
+}
+
+
+
+void mymem_destroy(void *ptr)
+{
+//memset()
+//bzero()
+}
+
+
+
+
+
+
+
+
+
+

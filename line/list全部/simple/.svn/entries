@@ -1,0 +1,79 @@
+8
+
+dir
+295
+svn://192.168.1.254/coder53/ds/line/list/simple
+svn://192.168.1.254
+
+
+
+2012-07-26T17:22:47.513135Z
+290
+coder49
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+43639801-acfd-4e47-983f-bd6c46cd4a6f
+
+nohead.c
+file
+
+
+
+
+2012-07-26T04:18:55.000000Z
+00588877b25fdb104bccda7af49fb0c5
+2012-07-26T12:16:53.795341Z
+287
+coder49
+
+head
+dir
+
+typedef_log
+file
+
+
+
+
+2012-07-26T09:22:38.000000Z
+4a7bd5a3fa3e1721f466d27ecb9edb76
+2012-07-26T17:22:47.513135Z
+290
+coder49
+
+polynomial.c
+file
+
+
+
+
+2012-07-26T02:41:31.000000Z
+4bde24f9656081882aba4a886c2a542b
+2012-07-26T10:38:40.776113Z
+285
+coder49
+
+josephu.c
+file
+
+
+
+
+2012-07-26T06:36:02.000000Z
+31036cea39fc5e1d09652fb976b98966
+2012-07-26T14:36:12.005760Z
+288
+coder49
+

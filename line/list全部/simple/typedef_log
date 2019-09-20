@@ -1,0 +1,51 @@
+
+typedef int INT
+INT a-->int a
+
+typedef struct score SCORE
+SCORE stu-->struct score stu
+SCORE *p	-->struct score *p
+
+typedef struct score *SCOREP
+
+SCOREP datap--->struct score *datap
+
+
+
+typedef int A[6]  --> int[6] --> A
+A  aaa-->int aaa[6]
+
+
+------------------------------------------------
+#define INT int
+typedef int INT;
+
+INT a-->int a
+
+
+#define INT int *
+typedef int *INT;
+
+INT p,q; --> int *p,q;
+INT p,q; --> int *p , *q;
+
+-----------------------------------------------
+
+void qsort(int(*compar)(const void *, const void *));
+
+1)typedef int FUN(const void *, const void *)
+	void qsort(FUN *);
+
+2)typedef int (*FUNP)(const void *, const void *)
+	void qsort(FUNP);
+
+
+
+
+
+
+
+
+
+
+

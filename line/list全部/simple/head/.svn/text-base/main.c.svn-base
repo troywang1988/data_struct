@@ -1,0 +1,40 @@
+#include <stdio.h>
+
+#include "list.h"
+
+
+int main()
+{
+	linklist *L;
+	datatype arr[] = {8,3,17,65,23,12},tmp = 100;
+	int i,ret;
+	
+	L = linklist_create();
+	if(L == NULL)
+		return -1;
+
+	for(i = 0 ; i < sizeof(arr)/sizeof(*arr); i++)
+		linklist_order_insert(L,&arr[i]);
+	linklist_display(L);
+
+	linklist_insert(L,2,&tmp);
+	linklist_display(L);
+	
+	linklist_delete_at(L,2,&tmp);
+	/*if error*/
+	linklist_display(L);
+
+	tmp = 23;
+	linklist_delete(L,&tmp);
+	linklist_display(L);
+
+
+	linklist_destroy(L);
+	return 0;
+}
+
+
+
+
+
+
